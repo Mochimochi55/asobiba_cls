@@ -1,1 +1,1 @@
-# pytorch_image_recognition
+# mochi_reco
