@@ -1,0 +1,22 @@
+mode: "train"  # train or test
+
+dataset:
+    train:
+        path: "train"
+        number_of_sample: 4  # batch size
+        num_workers: 0
+        augmentations:
+            Resize: (512, 512, p=1)
+            HorizontalFlip: (p=0.5)
+    val:
+        path: "val"
+        augmentations:
+            Resize: (512, 512, p=1)
+
+train_info:  # Please refer to the yaml_doc.md
+    maximum_epoch: 100
+    save_interval: 5
+    model: "EfficientNet-b0"
+    criterion: torch.nn.CrossEntropyLoss()
+    optimizer: torch.optim.SGD(model.parameters(), lr=1.0e-4, momentum=0.9)
+    scheduler: CosineAnnealingWarmUpRestarts(optimizer, T_0=45, eta_max=1.0e-2, T_up=10)

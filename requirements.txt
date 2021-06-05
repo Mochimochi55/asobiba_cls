@@ -1,0 +1,6 @@
+albumentations
+efficientnet-pytorch
+opencv-python
+scikit-learn
+tensorboard
+tqdm

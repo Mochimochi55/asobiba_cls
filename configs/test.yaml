@@ -1,0 +1,12 @@
+mode: "test"  # train or test
+
+dataset:
+    test:
+        number_of_sample: 4  # batch size
+        num_workers: 0
+        path: "test"
+        augmentations:
+            Resize: (256, 256, p=1)
+
+test_info:  # Please refer to the yaml_doc.md
+    wight_path: "./logs/EfficientNet-b0_cls02_20210605_193915/models/EfficientNet-b0_cls02_ep0076.pth"
