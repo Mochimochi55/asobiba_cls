@@ -1,5 +1,4 @@
-## Saved result
-Details of csv
+## Details of csv
 
     labels: xxx
     wight path: xxx.pth
