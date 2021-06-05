@@ -1,5 +1,12 @@
 # mochi_reco
 
+python version: 3.8.6
+pytorch version: 1.8.1 LTS
+
+Requirements
+
+    pip install -r requirements.txt
+
 datasets
 
     folder / label_0 / xxx.jpg
