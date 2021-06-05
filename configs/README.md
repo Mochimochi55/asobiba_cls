@@ -1,6 +1,11 @@
 ## Train config
 List of models :
 
+    resnet18
+    resnet34
+    resnet50
+    resnet101
+    resnet152
     EfficientNet-b0
     EfficientNet-b1
     EfficientNet-b2
@@ -14,13 +19,19 @@ List of models :
 
 List of criterion :
 
-    torch.nn.CrossEntropyLoss()
-    torch.nn.BCEWithLogitsLoss()
+    CrossEntropyLoss()
+    BCEWithLogitsLoss()
 
 List of optimizer :
 
-    torch.optim.SGD(model.parameters(), lr=1.0e-4, momentum=0.9)
+    SGD(model.parameters(), lr=1.0e-4, momentum=0.9)
+    Adagrad(model.parameters(), lr=1.0e-4)
+    Adam(model.parameters(), lr=1.0e-4)
+    Adamax(model.parameters(), lr=1.0e-4)
 
 List of scheduler :
 
-    CosineAnnealingWarmUpRestarts(optimizer, T_0=45, eta_max=1.0e-2, T_up=10)
+    StepLR(optimizer, step_size=20, gamma=0.5)
+    ExponentialLR(optimizer, gamma=0.95)
+    CosineAnnealingLR(optimizer, T_max=20, eta_min=1.0e-2)
+    CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2, eta_min=1.0e-2)

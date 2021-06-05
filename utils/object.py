@@ -6,6 +6,9 @@ from dataclasses import InitVar, dataclass
 from typing import Any, Dict, List
 
 import torch
+from torch.nn import *
+from torch.optim import *
+from torch.optim.lr_scheduler import *
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
@@ -13,7 +16,6 @@ from .data.dataset import ImageFolderForAlbumentations
 from .data.sampler import BalancedBatchSampler
 from .data.transforms import get_transforms
 from .models.models import get_model
-from .scheduler.cosine_annearing_with_warmup import CosineAnnealingWarmUpRestarts
 
 
 @dataclass

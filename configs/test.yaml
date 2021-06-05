@@ -9,4 +9,4 @@ dataset:
             Resize: (256, 256, p=1)
 
 test_info:  # Please refer to the yaml_doc.md
-    wight_path: "./logs/EfficientNet-b0_cls02_20210605_193915/models/EfficientNet-b0_cls02_ep0076.pth"
+    wight_path: "./logs/resnet18_cls02_20210605_230315/models/resnet18_cls02_ep0001.pth"

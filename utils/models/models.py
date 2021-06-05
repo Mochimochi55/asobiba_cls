@@ -1,5 +1,7 @@
 from typing import Any
 
+import torch.nn as nn
+import torchvision
 from efficientnet_pytorch import EfficientNet
 
 
@@ -12,7 +14,11 @@ def get_model(name: str, classes: int) -> Any:
     Returns:
         Any: Model
     """
-    if "EfficientNet" in name:
+    if "resnet" in name:
+        model = eval(f"torchvision.models.{name}(pretrained=True)")
+        num_ftrs = model.fc.in_features
+        model.fc = nn.Linear(num_ftrs, classes)
+    elif "EfficientNet" in name:
         num = name.split("-")[1]
         model = EfficientNet.from_pretrained( f"efficientnet-{num}", num_classes=classes)
 
