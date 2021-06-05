@@ -1,7 +1,7 @@
 # mochi_reco
 
-python version: 3.8.6
-pytorch version: 1.8.1 LTS
+    python version: 3.8.6
+    pytorch version: 1.8.1 LTS
 
 Requirements
 
