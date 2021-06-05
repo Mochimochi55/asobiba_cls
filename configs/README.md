@@ -1,4 +1,6 @@
 ## Train config
+Augmentations: https://albumentations.ai/docs/
+
 List of models :
 
     resnet18
