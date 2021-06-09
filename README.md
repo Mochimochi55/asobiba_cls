@@ -1,4 +1,4 @@
-# mochi_reco
+# mochi_cls
 
     python version: 3.8.6
     pytorch version: 1.8.1 LTS
