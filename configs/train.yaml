@@ -19,4 +19,4 @@ train_info:  # Please refer to the yaml_doc.md
     model: "resnet18"
     criterion: CrossEntropyLoss()
     optimizer: SGD(model.parameters(), lr=1.0e-4, momentum=0.9)
-    scheduler: CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2, eta_min=1.0e-3)
+    scheduler: CosineAnnealingWarmUpRestarts(optimizer, T_0=50, eta_max=1.0e-2, T_up=10)

@@ -16,6 +16,7 @@ from .data.dataset import ImageFolderForAlbumentations
 from .data.sampler import BalancedBatchSampler
 from .data.transforms import get_transforms
 from .models.models import get_model
+from .scheduler import CosineAnnealingWarmUpRestarts
 
 
 @dataclass
@@ -102,7 +103,7 @@ class ImgRecoObject:
     model: InitVar = None
     criterion: InitVar = None
     is_cuda: bool = False
-    is_dataparallel: bool = False
+    # is_dataparallel: bool = False
 
     def __post_init__(self, dummy, dummy2) -> None:
         if self.is_train:
@@ -119,20 +120,20 @@ class ImgRecoObject:
             # Load weight
             self.model.load_state_dict(torch.load(self.cfg["wight_path"]))
 
-        # DataParallel
-        if torch.cuda.device_count() > 1:
-            self.enable_dataparallel()
-            self.is_dataparallel = True
+        # # DataParallel
+        # if torch.cuda.device_count() > 1:
+        #     self.enable_dataparallel()
+        #     self.is_dataparallel = True
 
         # Use cuda
         if torch.cuda.is_available():
             self.enable_cuda()
             self.is_cuda = True
 
-    def enable_dataparallel(self) -> None:
-        """ Enable dataparallel.
-        """
-        self.model = torch.nn.DataParallel(self.model)
+    # def enable_dataparallel(self) -> None:
+    #     """ Enable dataparallel.
+    #     """
+    #     self.model = torch.nn.DataParallel(self.model)
 
     def enable_cuda(self) -> None:
         """ Enable cuda.
