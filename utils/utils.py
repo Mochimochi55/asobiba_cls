@@ -47,10 +47,10 @@ def test_logger(data_obj, imgreco_obj, logger) -> None:
     """
     with open(logger["log_file"], "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["labels: ", data_obj.classes])
-        writer.writerow(["wight path :", imgreco_obj.cfg["wight_path"]])
-        writer.writerow(["Total: ", logger["counter"], "Correct: ", logger["correct"],
-                         "Miss: ", logger["miss"], "Acc: ", f"{logger['acc']:.2f}%"])
+        writer.writerow(["labels", data_obj.classes])
+        writer.writerow(["wight path", imgreco_obj.cfg["wight_path"]])
+        writer.writerow(["Total", logger["counter"], "Correct", logger["correct"],
+                         "Miss", logger["miss"], "Acc", f"{logger['acc']:.2f}%"])
         writer.writerow(["Confusion matrix"])
 
         for m in logger["matrix"]:
