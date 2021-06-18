@@ -6,14 +6,14 @@ dataset:
         number_of_sample: 4  # batch size
         num_workers: 0
         augmentations:
-            Resize: (512, 512, p=1)
+            Resize: (256, 256, p=1)
             HorizontalFlip: (p=0.5)
     val:
         path: "val"
         augmentations:
-            Resize: (512, 512, p=1)
+            Resize: (256, 256, p=1)
 
-train_info:  # Please refer to the yaml_doc.md
+train_info:  # Please refer to the configs/README.md
     maximum_epoch: 100
     save_interval: 5
     model: "resnet18"

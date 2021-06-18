@@ -1,7 +1,6 @@
 import csv
 import datetime
 import pathlib
-import shutil
 from dataclasses import InitVar, dataclass
 from typing import Any, Dict, List
 
@@ -17,13 +16,15 @@ from .data.sampler import BalancedBatchSampler
 from .data.transforms import get_transforms
 from .models.models import get_model
 from .scheduler import CosineAnnealingWarmUpRestarts
+from .utils import write_yaml
 
 
 @dataclass
 class DataObject:
     """ Objects that manage data.
+
     Args:
-        cfg (Dict): Dataset config
+        cfg (Dict): Dataset in yaml
     """
     cfg: Dict
     classes: InitVar = None
@@ -61,6 +62,7 @@ class DataObject:
 
     def prepare_datasets(self) -> Dict:
         """ preparetion datasets.
+
         Returns:
             Dict: Train dataset and val dataset.
         """
@@ -74,6 +76,7 @@ class DataObject:
 
     def prepare_dataloaders(self) -> Dict:
         """ preparetion dataloaders.
+
         Returns:
             Dict: Train dataloader and val dataloader.
         """
@@ -92,31 +95,35 @@ class DataObject:
 @dataclass
 class ImgRecoObject:
     """ Image recognition model.
+
     Args:
-        cfg (Dict): Train config
-        classes (Dict): class info
+        cfg (Dict): Train_info or test_info in yaml
+        classes (Dict): Class info
         is_train (bool): Train(True) or Test(False), Default is True
     """
     cfg: Dict
     classes: Dict
     is_train: bool = True
     model: InitVar = None
+    model_name: str = None
     criterion: InitVar = None
     is_cuda: bool = False
-    # is_dataparallel: bool = False
+    is_dataparallel: bool = False
 
     def __post_init__(self, dummy, dummy2) -> None:
         if self.is_train:
+            self.model_name = self.cfg["model"]
+
             # Model
-            self.model = get_model(self.cfg["model"], len(self.classes))
+            self.model = get_model(self.model_name, len(self.classes))
             # Criterion
             self.criterion = eval(self.cfg["criterion"])
         else:
             fname = str(pathlib.Path(self.cfg["wight_path"]).name)
-            model_name = fname.split("_")[0]
+            self.model_name = fname.split("_")[0]
 
             # Model
-            self.model = get_model(model_name, len(self.classes))
+            self.model = get_model(self.model_name, len(self.classes))
             # Load weight
             self.model.load_state_dict(torch.load(self.cfg["wight_path"]))
 
@@ -137,17 +144,27 @@ class ImgRecoObject:
 
     def enable_cuda(self) -> None:
         """ Enable cuda.
+
         """
         self.model.cuda()
         if self.is_train:
             self.criterion.cuda()
 
+    def get_model_name(self) -> None:
+        """ Get model name.
+
+        Returns:
+            str: Model name
+        """
+        return self.model_name
+
 
 @dataclass
 class ParamsObject:
     """ Parameters.
+
     Args:
-        cfg (Dict): Train config
+        cfg (Dict): Train_config in yaml
     """
     cfg: Dict
     maximum_epoch: InitVar = None
@@ -163,7 +180,8 @@ class ParamsObject:
         self.save_interval = self.cfg["save_interval"]
 
     def set_optimizer(self, model: Any) -> None:
-        """ set optimizer
+        """ Set optimizer.
+
         Args:
             model (Any): Model object
         """
@@ -171,7 +189,7 @@ class ParamsObject:
         self.optimizer = eval(self.cfg["optimizer"])
 
     def set_scheduler(self) -> None:
-        """ set scheduler
+        """ Set scheduler.
         """
         # Scheduler
         optimizer = self.optimizer
@@ -181,13 +199,12 @@ class ParamsObject:
 @dataclass
 class LogInfomation:
     """ Manage log.
+
     Args:
-        path (str): Yaml path
-        model_name (str): Model name
+        cfg (Dict): Train config
         classes (Dict): class info
     """
-    path: str
-    model_name: str
+    cfg: Dict
     classes: Dict
     outputs_date: InitVar = None
     outputsdir: InitVar = None
@@ -195,16 +212,18 @@ class LogInfomation:
     tesntorboard_writer: InitVar = None
 
     def __post_init__(self, dummy, dummy2, dummy3, dummy4) -> None:
+        model_name = self.cfg["train_info"]["model"]
+
         # Datetime
-        self.outputs_date = str(datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
+        self.outputs_date = str(
+            datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
 
         # Outputs directory
-        self.outputsdir = f"./logs/{self.model_name}_cls{len(self.classes):02}_{self.outputs_date}/"
+        self.outputsdir = f"./logs/{model_name}_cls{len(self.classes):02}_{self.outputs_date}/"
         pathlib.Path(self.outputsdir).mkdir(exist_ok=True, parents=True)
 
         # Copy yaml
-        fname = pathlib.Path(self.path).name
-        shutil.copyfile(self.path, f"{self.outputsdir}{fname}")
+        write_yaml(f"{self.outputsdir}config.yaml", self.cfg)
 
         # Models directory
         self.model_outsputdir = f"{self.outputsdir}models/"
@@ -215,6 +234,7 @@ class LogInfomation:
 
     def dataset_log(self, type: str, samples: List) -> None:
         """ Dataset logging.
+        
         Args:
             type (str): Train, Val
             samples (List): Image path list

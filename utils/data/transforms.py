@@ -7,6 +7,7 @@ from albumentations.pytorch.transforms import ToTensorV2
 
 def get_transforms(aug_dict: Dict) -> Compose:
     """ Read augmentation information.
+
     Args:
         aug_dict (Dict): Dictionary of classes and parameters
 

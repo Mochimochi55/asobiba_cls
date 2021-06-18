@@ -6,7 +6,8 @@ from torchvision.datasets.folder import ImageFolder
 
 
 def img_reader(path: str) -> np.array:
-    """ img reader.
+    """ Img reader.
+
     Args:
         path (str): Img path
 
@@ -25,7 +26,8 @@ class ImageFolderForAlbumentations(ImageFolder):
                                                            loader=loader, is_valid_file=is_valid_file)
 
     def __getitem__(self, index: int) -> Tuple[Any, Any]:
-        """
+        """ Get item.
+
         Args:
             index (int): Index
 

@@ -7,6 +7,7 @@ from efficientnet_pytorch import EfficientNet
 
 def get_model(name: str, classes: int) -> Any:
     """ Get model.
+    
     Args:
         name (str): Model name
         classes (int): Number of classes

@@ -6,14 +6,14 @@ import torch
 from sklearn.metrics import confusion_matrix
 from tqdm import tqdm
 
-from utils.object import DataObject, ImgRecoObject, LogInfomation, ParamsObject
-
+from .object import DataObject, ImgRecoObject, LogInfomation, ParamsObject
 from .utils import test_logger
 
 
 def train_run(data_obj: DataObject, imgreco_obj: ImgRecoObject,
               params_obj: ParamsObject, log_info: LogInfomation) -> None:
-    """ Start Training
+    """ Start Training.
+
     Args:
         data_obj (DataObject): DataObject
         imgreco_obj (ImgRecoObject): ImgRecoObject
@@ -76,7 +76,7 @@ def train_run(data_obj: DataObject, imgreco_obj: ImgRecoObject,
 
             # Save
             if epoch == 0 or epoch % params_obj.save_interval == 0:
-                model_file_name = f"{log_info.model_name}_cls{len(log_info.classes):02}_ep{epoch+1:04}.pth"
+                model_file_name = f"{imgreco_obj.get_model_name()}_cls{len(log_info.classes):02}_ep{epoch+1:04}.pth"
                 if imgreco_obj.is_dataparallel:
                     model_weight = imgreco_obj.model.module.state_dict()
                 else:
@@ -91,7 +91,8 @@ def train_run(data_obj: DataObject, imgreco_obj: ImgRecoObject,
 
 
 def test_run(data_obj: DataObject, imgreco_obj: ImgRecoObject) -> None:
-    """ Start Training
+    """ Start Testing.
+
     Args:
         data_obj (DataObject): DataObject
         imgreco_obj (ImgRecoObject): ImgRecoObject
@@ -145,5 +146,6 @@ def test_run(data_obj: DataObject, imgreco_obj: ImgRecoObject) -> None:
             "dor_list": dor_list}
         test_logger(data_obj, imgreco_obj, logger)
 
-        print(f"\nTotal: {counter}, Correct: {correct}, Miss: {miss}, Acc: {acc:.2f}%")
+        print(
+            f"\nTotal: {counter}, Correct: {correct}, Miss: {miss}, Acc: {acc:.2f}%")
         print(f"Confusion matrix\n{matrix}")

@@ -1,19 +1,20 @@
 import argparse
+import codecs
 import csv
 import sys
-from typing import Dict
+from typing import Dict, List
 
 import yaml
 
 
 def get_argparse() -> argparse.Namespace:
     """ Get argsparse.
+
     Returns:
         argparse.Namespace: Args data (configuration file)
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--config", help="Please set the path of the configuration file.")
+    parser.add_argument("-c", "--config", help="Please set the path of the configuration file.")
     args = parser.parse_args()
 
     return args
@@ -21,6 +22,7 @@ def get_argparse() -> argparse.Namespace:
 
 def read_yaml(path: str) -> Dict:
     """ Read yaml and return the read data.
+
     Args:
         path (str): Yaml path
 
@@ -38,8 +40,32 @@ def read_yaml(path: str) -> Dict:
     return cfg
 
 
+def write_yaml(path: str, cfg: Dict) -> None:
+    """ Write yaml.
+
+    Args:
+        path (str): Yaml path
+        Dict: Yaml data
+    """
+    with codecs.open(path, "w", "utf-8") as f:
+        yaml.dump(cfg, f, encoding="utf-8", allow_unicode=True)
+
+
+def tracking(tracker: List) -> None:
+    """ Error tracking.
+
+    Args:
+        tracker (List): Tracking list
+    """
+    for idx, t in enumerate(tracker):
+        print(f"===== Trace number: {idx + 1} =====")
+        print(f"[Config parameters]\n{t[0]}\n")
+        print(f"[Error message]\n{t[1]}\n")
+
+
 def test_logger(data_obj, imgreco_obj, logger) -> None:
-    """ Test logging
+    """ Test logging.
+
     Args:
         data_obj (DataObject): DataObject
         imgreco_obj (ImgRecoObject): ImgRecoObject
