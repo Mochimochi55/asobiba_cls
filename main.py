@@ -1,3 +1,4 @@
+import traceback
 from typing import Dict
 
 import numpy as np
@@ -82,8 +83,8 @@ def main() -> None:
             for pattern in cfg["multiple"]:
                 try:
                     train(pattern)
-                except Exception as e:
-                    tracker.append((cfg, e))
+                except Exception:
+                    tracker.append((cfg, traceback.format_exc()))
                     continue
                 finally:
                     torch.cuda.empty_cache()

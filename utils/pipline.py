@@ -61,8 +61,7 @@ def train_run(data_obj: DataObject, imgreco_obj: ImgRecoObject,
                 running_corrects += torch.sum(preds == labels.data)
 
             epoch_loss = running_loss / len(data_obj.datasets[phase])
-            epoch_acc = running_corrects.float(
-            ) / len(data_obj.datasets[phase])
+            epoch_acc = running_corrects / len(data_obj.datasets[phase])
 
             if phase == "train":
                 train_loss = epoch_loss
