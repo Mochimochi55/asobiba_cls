@@ -1,22 +1,30 @@
-mode: "train"  # train or test
+MODE: "train"  # train or test
 
-dataset:
-    train:
-        path: "train"
-        number_of_sample: 4  # batch size
-        num_workers: 0
-        augmentations:
+DEVICE: "cuda:0"  # cuda:x or cpu
+
+DATASET:
+    TRAIN:
+        PATH: "train"
+        NUMBER_OF_SAMPLE: 4  # batch size
+        NUM_WORKERS: 0
+        AUGMENTATIONS:
             Resize: (256, 256, p=1)
             HorizontalFlip: (p=0.5)
-    val:
-        path: "val"
-        augmentations:
+    VAL:
+        PATH: "val"
+        AUGMENTATIONS:
             Resize: (256, 256, p=1)
 
-train_info:  # Please refer to the configs/README.md
-    maximum_epoch: 100
-    save_interval: 5
-    model: "resnet18"
-    criterion: CrossEntropyLoss()
-    optimizer: SGD(model.parameters(), lr=1.0e-4, momentum=0.9)
-    scheduler: CosineAnnealingWarmUpRestarts(optimizer, T_0=50, eta_max=1.0e-2, T_up=10)
+TRAIN_INFO:  # Please refer to the configs/README.md
+    MAXIMUM_EPOCH: 40
+    SAVE_INTERVAL: 5
+    MODEL: "resnet18"
+    CRITERION: CrossEntropyLoss()
+    OPTIMIZER: SGD(model.parameters(), lr=1.0e-4, momentum=0.9)
+    SCHEDULER: CosineAnnealingWarmUpRestarts(optimizer, T_0=50, eta_max=1.0e-2, T_up=10)
+
+NOTIFICATION:
+    SLACK:
+        WEBHOOK_URL: ""
+        CHANNEL:
+        END_MESSAGE: "[Windows Server]: Learning is complete."

@@ -4,6 +4,7 @@ import pathlib
 from dataclasses import InitVar, dataclass
 from typing import Any, Dict, List
 
+import slackweb
 import torch
 from torch.nn import *
 from torch.optim import *
@@ -33,32 +34,32 @@ class DataObject:
     dataloader: InitVar = None
 
     def __post_init__(self, dummy, dummy2, dummy3, dummy4) -> None:
-        if "train" in self.cfg and "val" in self.cfg:
+        if "TRAIN" in self.cfg and "VAL" in self.cfg:
             # Augmentation
             self.transforms = {
-                "train": get_transforms(self.cfg["train"]["augmentations"]),
-                "val": get_transforms(self.cfg["val"]["augmentations"])
+                "TRAIN": get_transforms(self.cfg["TRAIN"]["AUGMENTATIONS"]),
+                "VAL": get_transforms(self.cfg["VAL"]["AUGMENTATIONS"])
             }
             # Dataset
             self.datasets = self.prepare_datasets()
             # Labels
-            self.classes = self.datasets["train"].class_to_idx
+            self.classes = self.datasets["TRAIN"].class_to_idx
             # Dataloader
             self.dataloaders = self.prepare_dataloaders()
 
-        elif "test" in self.cfg:
+        elif "TEST" in self.cfg:
             # Augmentation
-            self.transforms = get_transforms(self.cfg["test"]["augmentations"])
+            self.transforms = get_transforms(self.cfg["TEST"]["AUGMENTATIONS"])
             # Dataset
-            self.datasets = ImageFolderForAlbumentations(root=self.cfg["test"]["path"],
+            self.datasets = ImageFolderForAlbumentations(root=self.cfg["TEST"]["PATH"],
                                                          transform=self.transforms)
             # Labels
             self.classes = self.datasets.class_to_idx
             # Dataloader
-            self.dataloaders = DataLoader(self.datasets, batch_size=self.cfg["test"]["number_of_sample"],
-                                          num_workers=self.cfg["test"]["num_workers"])
+            self.dataloaders = DataLoader(self.datasets, batch_size=self.cfg["TEST"]["NUMBER_OF_SAMPLE"],
+                                          num_workers=self.cfg["TEST"]["NUM_WORKERS"])
         else:
-            print("[Error]: Check the config file")
+            print("[Error]: Check the config file. mode is train or test")
 
     def prepare_datasets(self) -> Dict:
         """ preparetion datasets.
@@ -66,11 +67,11 @@ class DataObject:
         Returns:
             Dict: Train dataset and val dataset.
         """
-        train_dataset = ImageFolderForAlbumentations(root=self.cfg["train"]["path"],
-                                                     transform=self.transforms["train"])
-        val_dataset = ImageFolderForAlbumentations(root=self.cfg["val"]["path"],
-                                                   transform=self.transforms["val"])
-        image_datasets = {"train": train_dataset, "val": val_dataset}
+        train_dataset = ImageFolderForAlbumentations(root=self.cfg["TRAIN"]["PATH"],
+                                                     transform=self.transforms["TRAIN"])
+        val_dataset = ImageFolderForAlbumentations(root=self.cfg["VAL"]["PATH"],
+                                                   transform=self.transforms["VAL"])
+        image_datasets = {"TRAIN": train_dataset, "VAL": val_dataset}
 
         return image_datasets
 
@@ -80,13 +81,13 @@ class DataObject:
         Returns:
             Dict: Train dataloader and val dataloader.
         """
-        balanced_batch_sampler = BalancedBatchSampler(self.datasets["train"], len(self.classes),
-                                                      self.cfg["train"]["number_of_sample"])
+        balanced_batch_sampler = BalancedBatchSampler(self.datasets["TRAIN"], len(self.classes),
+                                                      self.cfg["TRAIN"]["NUMBER_OF_SAMPLE"])
         dataloaders = {
-            "train": DataLoader(self.datasets["train"], batch_sampler=balanced_batch_sampler,
-                                num_workers=self.cfg["train"]["num_workers"]),
-            "val": DataLoader(self.datasets["val"], batch_size=self.cfg["train"]["number_of_sample"],
-                              num_workers=self.cfg["train"]["num_workers"])
+            "TRAIN": DataLoader(self.datasets["TRAIN"], batch_sampler=balanced_batch_sampler,
+                                num_workers=self.cfg["TRAIN"]["NUM_WORKERS"]),
+            "VAL": DataLoader(self.datasets["VAL"], batch_size=self.cfg["TRAIN"]["NUMBER_OF_SAMPLE"],
+                              num_workers=self.cfg["TRAIN"]["NUM_WORKERS"])
         }
 
         return dataloaders
@@ -99,56 +100,48 @@ class ImgRecoObject:
     Args:
         cfg (Dict): Train_info or test_info in yaml
         classes (Dict): Class info
+        device (str): Cuda or cpu
         is_train (bool): Train(True) or Test(False), Default is True
+        is_cuda (bool): cuda(True) or cpu(False), Default is False
     """
     cfg: Dict
     classes: Dict
+    device: str
     is_train: bool = True
+    is_cuda: bool = False
     model: InitVar = None
     model_name: str = None
     criterion: InitVar = None
-    is_cuda: bool = False
-    is_dataparallel: bool = False
 
     def __post_init__(self, dummy, dummy2) -> None:
         if self.is_train:
-            self.model_name = self.cfg["model"]
+            self.model_name = self.cfg["MODEL"]
 
             # Model
             self.model = get_model(self.model_name, len(self.classes))
             # Criterion
-            self.criterion = eval(self.cfg["criterion"])
+            self.criterion = eval(self.cfg["CRITERION"])
         else:
-            fname = str(pathlib.Path(self.cfg["wight_path"]).name)
+            fname = str(pathlib.Path(self.cfg["WEIGHT_PATH"]).name)
             self.model_name = fname.split("_")[0]
 
             # Model
             self.model = get_model(self.model_name, len(self.classes))
             # Load weight
-            self.model.load_state_dict(torch.load(self.cfg["wight_path"]))
+            self.model.load_state_dict(torch.load(self.cfg["WEIGHT_PATH"]))
 
-        # # DataParallel
-        # if torch.cuda.device_count() > 1:
-        #     self.enable_dataparallel()
-        #     self.is_dataparallel = True
-
-        # Use cuda
-        if torch.cuda.is_available():
-            self.enable_cuda()
+        if "cuda" in self.device:
             self.is_cuda = True
+            # Set device
+            self.set_device()
 
-    # def enable_dataparallel(self) -> None:
-    #     """ Enable dataparallel.
-    #     """
-    #     self.model = torch.nn.DataParallel(self.model)
-
-    def enable_cuda(self) -> None:
+    def set_device(self) -> None:
         """ Enable cuda.
 
         """
-        self.model.cuda()
+        self.model.to(self.device)
         if self.is_train:
-            self.criterion.cuda()
+            self.criterion.to(self.device)
 
     def get_model_name(self) -> None:
         """ Get model name.
@@ -171,13 +164,18 @@ class ParamsObject:
     save_interval: InitVar = None
     optimizer: InitVar = None
     scheduler: InitVar = None
+    best_params: InitVar = None
 
-    def __post_init__(self, dummy, dummy2, dummy3, dummy4) -> None:
+    def __post_init__(self, dummy, dummy2, dummy3, dummy4, dummy5) -> None:
         # Max epoch
-        self.maximum_epoch = self.cfg["maximum_epoch"]
+        self.maximum_epoch = self.cfg["MAXIMUM_EPOCH"]
 
         # Save interval
-        self.save_interval = self.cfg["save_interval"]
+        self.save_interval = self.cfg["SAVE_INTERVAL"]
+
+        # Best parameter
+        self.best_params = {"BESTACC": 0, "BESTEP": 0,
+                            "BESTLOSS": None, "BESTWEIGHT": None}
 
     def set_optimizer(self, model: Any) -> None:
         """ Set optimizer.
@@ -186,14 +184,14 @@ class ParamsObject:
             model (Any): Model object
         """
         # Optimizer
-        self.optimizer = eval(self.cfg["optimizer"])
+        self.optimizer = eval(self.cfg["OPTIMIZER"])
 
     def set_scheduler(self) -> None:
         """ Set scheduler.
         """
         # Scheduler
         optimizer = self.optimizer
-        self.scheduler = eval(self.cfg["scheduler"])
+        self.scheduler = eval(self.cfg["SCHEDULER"])
 
 
 @dataclass
@@ -212,7 +210,7 @@ class LogInfomation:
     tesntorboard_writer: InitVar = None
 
     def __post_init__(self, dummy, dummy2, dummy3, dummy4) -> None:
-        model_name = self.cfg["train_info"]["model"]
+        model_name = self.cfg["TRAIN_INFO"]["MODEL"]
 
         # Datetime
         self.outputs_date = str(
@@ -234,7 +232,7 @@ class LogInfomation:
 
     def dataset_log(self, type: str, samples: List) -> None:
         """ Dataset logging.
-        
+
         Args:
             type (str): Train, Val
             samples (List): Image path list
@@ -243,3 +241,35 @@ class LogInfomation:
             writer = csv.writer(f)
             for sample in samples:
                 writer.writerow(sample)
+
+
+@dataclass
+class SlackNotify:
+    """ Slack Notification.
+
+    Args:
+        webhook_url (str): Webhook URL of Slack
+        channel (str): Designated channel
+        end_message (str): Messaging to notify at the end of the program
+    """
+    webhook_url: str
+    channel: str = None
+    end_message: str = None
+    slack: InitVar = None
+
+    def __post_init__(self, dummy) -> None:
+        self.slack = slackweb.Slack(url=self.webhook_url)
+
+    def notify(self, text: str) -> None:
+        """Notification.
+
+        Args:
+            text (str): Message to be notified
+        """
+        self.slack.notify(text=text, channel=self.channel, user_name=pathlib.Path(__file__).name,
+                          icon_emoji=":loudspeaker:")
+
+    def end_notify(self):
+        """Notice of Termination.
+        """
+        self.notify(self.end_message)

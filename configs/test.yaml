@@ -1,12 +1,20 @@
-mode: "test"  # train or test
+MODE: "test"  # train or test
 
-dataset:
-    test:
-        number_of_sample: 4  # batch size
-        num_workers: 0
-        path: "test"
-        augmentations:
+DEVICE: "cuda:0"  # cuda:x or cpu
+
+DATASET:
+    TEST:
+        PATH: "test"
+        NUMBER_OF_SAMPLE: 4  # batch size
+        NUM_WORKERS: 0
+        AUGMENTATIONS:
             Resize: (256, 256, p=1)
 
-test_info:  # Please refer to the yaml_doc.md
-    wight_path: "./logs/resnet18_cls02_20210605_230315/models/resnet18_cls02_ep0001.pth"
+TEST_INFO:  # Please refer to the yaml_doc.md
+    WEIGHT_PATH: "./logs/resnet18_cls02_20210624_011441/models/resnet18_BestModel_cls02_ep0035_acc0.88889_loss0.44226.pth"
+
+NOTIFICATION:
+    SLACK:
+        WEBHOOK_URL: ""
+        CHANNEL:
+        END_MESSAGE: ""

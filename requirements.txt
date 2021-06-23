@@ -2,5 +2,6 @@ albumentations
 efficientnet-pytorch
 opencv-python
 scikit-learn
+slackweb
 tensorboard
 tqdm
