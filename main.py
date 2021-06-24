@@ -52,7 +52,7 @@ def test(cfg) -> None:
         cfg (Dict): test config
     """
     # Data instances
-    data_obj = DataObject(cfg=cfg["DATAET"])
+    data_obj = DataObject(cfg=cfg["DATASET"])
 
     # Model instances
     imgreco_obj = ImgRecoObject(cfg=cfg["TEST_INFO"], classes=data_obj.classes,

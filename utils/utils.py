@@ -71,22 +71,22 @@ def test_logger(data_obj, imgreco_obj, logger) -> None:
         imgreco_obj (ImgRecoObject): ImgRecoObject
         logger (Dict): Test result
     """
-    with open(logger["log_file"], "w", newline="") as f:
+    with open(logger["LOG_FILE"], "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["labels", data_obj.classes])
-        writer.writerow(["wight path", imgreco_obj.cfg["wight_path"]])
-        writer.writerow(["Total", logger["counter"], "Correct", logger["correct"],
-                         "Miss", logger["miss"], "Acc", f"{logger['acc']:.2f}%"])
+        writer.writerow(["weight path", imgreco_obj.cfg["WEIGHT_PATH"]])
+        writer.writerow(["Total", logger["COUNTER"], "Correct", logger["CORRECT"],
+                         "Miss", logger["MISS"], "Acc", f"{logger['ACC']:.2f}%"])
         writer.writerow(["Confusion matrix"])
 
-        for m in logger["matrix"]:
+        for m in logger["MATRIX"]:
             writer.writerow(m)
 
         writer.writerow(["Details"])
         writer.writerow(["path", "label", "judge",
                          "pred", "Degree of reliability"])
 
-        for sample, pred, dor in zip(data_obj.datasets.samples, logger["preds_list"], logger["dor_list"]):
+        for sample, pred, dor in zip(data_obj.datasets.samples, logger["PREDS_LIST"], logger["DOR_LIST"]):
             if sample[1] == pred:
                 judge = "correct"
             else:

@@ -155,14 +155,14 @@ def test_run(data_obj: DataObject, imgreco_obj: ImgRecoObject) -> None:
         matrix = confusion_matrix(labels_list, preds_list)
 
         logger = {
-            "log_file": log_file,
-            "counter": counter,
-            "correct": correct,
-            "miss": miss,
-            "acc": acc,
-            "matrix": matrix,
-            "preds_list": preds_list,
-            "dor_list": dor_list}
+            "LOG_FILE": log_file,
+            "COUNTER": counter,
+            "CORRECT": correct,
+            "MISS": miss,
+            "ACC": acc,
+            "MATRIX": matrix,
+            "PREDS_LIST": preds_list,
+            "DOR_LIST": dor_list}
         test_logger(data_obj, imgreco_obj, logger)
 
         print( f"\nTotal: {counter}, Correct: {correct}, Miss: {miss}, Acc: {acc:.2f}%")
