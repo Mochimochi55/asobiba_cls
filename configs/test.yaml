@@ -2,6 +2,8 @@ MODE: "test"  # train or test
 
 DEVICE: "cuda:0"  # cuda:x or cpu
 
+IS_GRADCAM: True
+
 DATASET:
     TEST:
         PATH: "test"
@@ -11,7 +13,7 @@ DATASET:
             Resize: (256, 256, p=1)
 
 TEST_INFO:  # Please refer to the yaml_doc.md
-    WEIGHT_PATH: "./logs/resnet18_cls02_20210624_011441/models/resnet18_BestModel_cls02_ep0035_acc0.88889_loss0.44226.pth"
+    WEIGHT_PATH: "./logs/resnet18_cls02_20210628_235545/models/resnet18_BestModel_cls02_ep0015_acc0.85621_loss0.65517.pth"
 
 NOTIFICATION:
     SLACK:

@@ -6,9 +6,10 @@ import torch
 
 from utils.object import (DataObject, ImgRecoObject, LogInfomation,
                           ParamsObject, SlackNotify)
-from utils.pipline import test_run, train_run
+from utils.pipline import gradcam_run, test_run, train_run
 from utils.utils import get_argparse, read_yaml, tracking
-
+import datetime
+import pathlib
 
 def train(cfg: Dict) -> None:
     """
@@ -58,13 +59,20 @@ def test(cfg) -> None:
     imgreco_obj = ImgRecoObject(cfg=cfg["TEST_INFO"], classes=data_obj.classes,
                                 device=cfg["DEVICE"], is_train=False)
 
+    # Make directory
+    now = str(datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
+    pathlib.Path(f"results/{now}").mkdir(exist_ok=True, parents=True)
+
     # Informtation
     print("=== Info ===")
     print(f"labels: {data_obj.classes}")
     print(f"wight path: {cfg['TEST_INFO']['WEIGHT_PATH']}")
 
     # Test start
-    test_run(data_obj, imgreco_obj)
+    test_run(data_obj, imgreco_obj, now)
+
+    if cfg["IS_GRADCAM"]:
+        gradcam_run(data_obj, imgreco_obj, now)
 
 
 def main() -> None:
